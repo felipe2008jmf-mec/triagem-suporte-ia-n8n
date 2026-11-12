@@ -18,3 +18,7 @@ Equipas de atendimento perdem tempo crítico a ler e triar manualmente pedidos d
                                                                                 │              │
                                                                                 ▼              ▼
                                                                         [Gmail: Alerta]     (Fim)
+
+```
+<img width="1728" height="610" alt="Captura de tela 2026-11-12 020420" src="https://github.com/user-attachments/assets/abadd201-0dd7-434d-a6fb-3d3dda643467" />
+<img width="1576" height="587" alt="Captura de tela 2026-11-12 020434" src="https://github.com/user-attachments/assets/547ed63b-d309-4abb-8139-a972584f8f45" />

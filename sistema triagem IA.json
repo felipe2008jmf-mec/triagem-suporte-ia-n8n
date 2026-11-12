@@ -1,0 +1,350 @@
+{
+  "name": "sistema triagem IA",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fbbe5e89-1c7f-4550-8777-6738172ce5d2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6ad0780e-9fd8-4506-80f4-08e4ce07cf32",
+      "name": "Webhook",
+      "webhookId": "fbbe5e89-1c7f-4550-8777-6738172ce5d2"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "models/gemini-3-flash-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analisa o seguinte email de suporte e responde APENAS com um objeto JSON válido (sem blocos de código markdown ```json):\n{\n  \"urgencia\": \"Alta, Média ou Baixa\",\n  \"categoria\": \"Técnico, Financeiro, Comercial ou Dúvida\",\n  \"resumo\": \"Resumo em 1 frase\",\n  \"resposta_sugerida\": \"Minuta de resposta profissional e empática\"\n}\n\nRemetente: {{ $json.body.remetente }}\nAssunto: {{ $json.body.assunto }}\nMensagem: {{ $json.body.mensagem }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "31766636-e539-4af9-bf31-aaa2f892c882",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "zQi6yFpHqlYsTyKo",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawText = $input.first().json.content.parts[0].text;\nconst parsed = JSON.parse(rawText);\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "9bfc1263-895a-4db8-93d4-aa03e12c78b2",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "16PE3DKViq-1ZuQt23qxHF7ymhbkujXhkuJWKVQVClrg",
+          "mode": "list",
+          "cachedResultName": "Triagem Suporte IA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16PE3DKViq-1ZuQt23qxHF7ymhbkujXhkuJWKVQVClrg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16PE3DKViq-1ZuQt23qxHF7ymhbkujXhkuJWKVQVClrg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data": "={{ $now.format('dd/MM/yyyy HH:mm') }}",
+            "Assunto ": "={{ $('Webhook').item.json.body.assunto }}",
+            "Remetente ": "={{ $('Webhook').item.json.body.remetente }}",
+            "Urgência ": "={{ $json.urgencia }}",
+            "Categoria": "={{ $json.categoria }}",
+            "Resumo": "={{ $json.resumo }}",
+            "Resposta Sugerida": "={{ $json.resposta_sugerida }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Data",
+              "displayName": "Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Remetente ",
+              "displayName": "Remetente ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Assunto ",
+              "displayName": "Assunto ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Urgência ",
+              "displayName": "Urgência ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Categoria",
+              "displayName": "Categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resumo",
+              "displayName": "Resumo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resposta Sugerida",
+              "displayName": "Resposta Sugerida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        816,
+        0
+      ],
+      "id": "7231fb58-2a7c-413a-b3a4-febcbe3744ba",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "AUu1NUegfOyP6sXX",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "ff89c8f8-1db7-47d3-a460-c877370c4c8e",
+              "leftValue": "={{ $json['Urgência '] }}",
+              "rightValue": "Alta",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "0aa78052-7286-424d-8e18-07333c264544",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "felipe2008jmf@gmail.com",
+        "subject": "={{ $json.Categoria }}{{ $json['Assunto '] }}",
+        "message": "=Um novo pedido de suporte de ALTA urgência foi recebido e registado no Google Sheets.\n\n• Remetente: {{ $json['Remetente '] }}\n• Data: {{ $json.Data }}\n• Resumo IA: {{ $json.Resumo }}\n\nMinuta de Resposta Sugerida:\n{{ $json['Resposta Sugerida'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1264,
+        -96
+      ],
+      "id": "3af1e5f1-bb16-47a8-83a8-6a7d9bf17e30",
+      "name": "Send a message",
+      "webhookId": "ba9c78d2-4b4b-4c45-a60d-f53fc885a600",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UzQV1VXYAvoEYlTn",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "jhonatan3108.app.n8n.cloud",
+            "user-agent": "curl/8.21.0",
+            "content-length": "196",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "2804:94:fe5d:e700:2106:13d6:91ee:7f25",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "BR",
+            "cf-ray": "a592bd1dcb1260cc-SJK",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "2804:94:fe5d:e700:2106:13d6:91ee:7f25, 172.68.5.133",
+            "x-forwarded-host": "jhonatan3108.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-swc-16-d54cbb6bf-6245n",
+            "x-is-trusted": "yes",
+            "x-real-ip": "2804:94:fe5d:e700:2106:13d6:91ee:7f25"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "remetente": "carlos@lojaexemplo.com",
+            "assunto": "URGENTE: Erro 500 no checkout",
+            "mensagem": "Desde as 14:30 os clientes encontram Erro 500 no pagamento via PIX. Precisamos de ajuda imediata."
+          },
+          "webhookUrl": "https://jhonatan3108.app.n8n.cloud/webhook-test/fbbe5e89-1c7f-4550-8777-6738172ce5d2",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6a4ce760-a737-46f5-ad90-062d27f53f92",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "22973e0d8b1b00935a9149040b880b3379964d430bb77c6533b36a39ff919759"
+  },
+  "nodeGroups": [],
+  "id": "cXpAwIMfiiL1Muhg",
+  "tags": []
+}
